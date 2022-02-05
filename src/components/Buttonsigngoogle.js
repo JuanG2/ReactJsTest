@@ -13,11 +13,11 @@ const signInWhitGoogle = () =>{
     }))
 }
 
-const buttonsign = (props) => { 
+const Buttonsigngoogle = (props) => { 
 return(
-    <button  onClick={signInWhitGoogle} className="button_signin">{props.text}</button>
+    <button  onClick={signInWhitGoogle} className="button_signin_google">{props.text}</button>
 )
 
 };
 
-export default buttonsign;
+export default Buttonsigngoogle;
