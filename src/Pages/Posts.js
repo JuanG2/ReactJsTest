@@ -7,13 +7,15 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import './Posts.css';
-import { Navigate } from 'react-router-dom';
 import { useUserContext } from "../context/userContext";
 import { useAuth } from "../firebase-config";
+import { async } from '@firebase/util';
 
 
 const url = "https://waco-api.herokuapp.com/api/posts";
 const urlall = "https://waco-api.herokuapp.com/api/posts/all";
+const urlput = "https://waco-api.herokuapp.com/api/posts/";
+const urlusersposts = "https://waco-api.herokuapp.com/api/users/";
 
 const Posts = (authorized) =>{
 
@@ -21,6 +23,9 @@ const Posts = (authorized) =>{
     const currentUser = useAuth();
     const [data,setData] = useState([]);
     const [modalInsert, setModalInsert] = useState(false);
+    const [modalEdit, setModalEdit] = useState(false);
+    const [modalDelete, setModalDelete] = useState(false);
+
 
     const [postInsertado, setPostInsertado] = useState({
         title:"",
@@ -34,7 +39,7 @@ const Posts = (authorized) =>{
             ...prevState,
             [name]:value
         }))
-        console.log(postInsertado);
+        //console.log(postInsertado);
     }
 
     /* const petitionGet= async()=>{
@@ -44,9 +49,16 @@ const Posts = (authorized) =>{
         })
     } */
 
-    const petitionGetAll= async()=>{
+    /* const petitionGetAll= async()=>{
         await axios.get(urlall).then(response =>{
-            console.log({data: response.data});
+            //console.log({data: response.data});
+            setData(response.data);
+        })
+    } */
+
+    const petitionGetAlluserPosts= async()=>{
+        await axios.get(urlusersposts+user.uid+"/post").then(response =>{
+            //console.log({data: response.data});
             setData(response.data);
         })
     }
@@ -60,12 +72,50 @@ const Posts = (authorized) =>{
         })
     }
 
+    const petitionPut=async()=>{
+        await axios.put(urlput+postInsertado.id, postInsertado)
+        .then(response=>{
+          var dataNueva=data;
+          dataNueva.map(post=>{
+            if(postInsertado.id===post.id){
+              post.title=postInsertado.title;
+              post.body=postInsertado.body;
+            }
+          })
+          setData(dataNueva);
+          openCloseModalEdit();
+        })
+    }
+
+    const petitionDelete=async()=>{
+        await axios.delete(urlput+postInsertado.id)
+        .then(response=>{
+            console.log(response);
+            console.log(response.data);
+          //setData(data.filter(post=>post.id!==postInsertado.id));
+          openCloseModalDelete();
+        })
+      }
+
     const openCloseModalInsert = () =>{
         setModalInsert(!modalInsert);
     }
 
+    const openCloseModalEdit = () =>{
+        setModalInsert(!modalInsert);
+    }
+
+    const openCloseModalDelete=()=>{
+        setModalDelete(!modalDelete);
+    }
+
+    const selectPost=(post, caso)=>{
+        setPostInsertado(post);
+        (caso==='Edit')?openCloseModalEdit():openCloseModalDelete()
+    }
+
     useEffect(async() =>{
-        await petitionGetAll();
+        await petitionGetAlluserPosts();
     },[])
     
     const ModalBody= (
@@ -76,15 +126,36 @@ const Posts = (authorized) =>{
             <TextField name="body" className='input_post' label="Post" onChange={handleChange}></TextField>
             <br/>
             <div>
-                <Button color='primary' onClick={petitionPost}>Insertar</Button>
-                <Button onClick={openCloseModalInsert}>Cancelar</Button>
+                <Button color='primary' onClick={()=> petitionPost()}>Insertar</Button>
+                <Button onClick={()=> openCloseModalInsert()}>Cancelar</Button>
             </div>
         </div>
     )
 
-    if(!authorized){
-        return <Navigate to="/login"/>
-    }
+    const ModalBodyEdit= (
+        <div className='modal_body'>
+            <h3>Editar body</h3>
+            <TextField name="title" className='input_post' label="Titulo" onChange={handleChange} value={postInsertado && postInsertado.title}></TextField>
+            <br/>
+            <TextField name="body" className='input_post' label="Post" onChange={handleChange} value={postInsertado && postInsertado.body}></TextField>
+            <br/>
+            <div>
+                <Button color='primary' onClick={()=>petitionPut()}>Insertar</Button>
+                <Button onClick={()=>openCloseModalEdit()}>Cancelar</Button>
+            </div>
+        </div>
+    )
+
+    const ModalBodyDelete= (
+        <div className='modal_body'>
+            <p>Esta seguro que desea elminar el post? <b>{postInsertado && postInsertado.nombre}</b></p>
+            <div>
+                <Button color='secondary' onClick={()=>petitionDelete()}>Si</Button>
+                <Button onClick={()=>openCloseModalDelete()}>No</Button>
+            </div>
+        </div>
+    )
+
 
     return(
     <div className='posts'>
@@ -92,30 +163,41 @@ const Posts = (authorized) =>{
             <Button style={{color: "rgba(255,255,255)"}} className="log_outB"onClick={logoutUser}>Log out</Button>
         </div>
       <Grid container className='posts_grid'>
-          {data.data?.map(consola=>(
-          <Grid item key={consola.id}>{/*KeyContent*/}
+          {data.data?.map(post=>(
+          <Grid item key={post.id}>{/*KeyContent*/}
             <Card className='post_card'>
               <CardActionArea>
                 <CardContent>
                   <Typography gutterBottom variant="h5" component="h2">
-                    {consola.title}
+                    {post.title}
                   </Typography>
-                  <Typography component="p">{consola.body}</Typography>
+                  <Typography component="p">{post.body}</Typography>
                 </CardContent>
               </CardActionArea>
               <CardActions>
-                <Button size="small" color="primary"> Update</Button>
-                <Button size="small" color="primary"> Delete</Button>
+                <Button onClick={()=>selectPost(post,'Edit')}size="small" color="primary"> Update</Button>
+                <Button onClick={()=>selectPost(post,'Eliminar')} size="small" color="primary"> Delete</Button>
               </CardActions>
             </Card>
           </Grid>
           ))}
       </Grid>
       
-      <Button style={{color: "rgba(0,0,0)"}} onClick={openCloseModalInsert}>Nuevo Post</Button>
+      <Button style={{color: "rgba(0,0,0)"}} onClick={()=>openCloseModalInsert()}>Nuevo Post</Button>
+
       <Modal open = {modalInsert}
       onClose = {openCloseModalInsert}>
           {ModalBody}
+      </Modal>
+
+      <Modal open = {modalEdit}
+      onClose = {openCloseModalEdit}>
+          {ModalBodyEdit}
+      </Modal>
+
+      <Modal open = {modalDelete}
+      onClose = {openCloseModalDelete}>
+          {ModalBodyDelete}
       </Modal>
       
     </div>
