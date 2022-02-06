@@ -11,7 +11,9 @@ function App() {
   return (
     <div className="App">
       {error && <p className="error">{error}</p>}
-      {loading ? <h2>Loading...</h2> : <> {user ? <Posts /> : <Auth />} </>}
+      {loading ? <h2>Loading...</h2> : <> {user ? 
+      <Posts /> 
+      : <Auth />} </>}
     </div>
     );
  

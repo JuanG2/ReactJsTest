@@ -27,10 +27,11 @@
     width: 80%;
 }
 
-.nav_posts{
+.buttons_posts{
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: center;
+    justify-items: center;
     width: 100%;
     background-color: rgb(75, 4, 189);
 }

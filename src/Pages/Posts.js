@@ -75,7 +75,8 @@ const Posts = (authorized) =>{
     const petitionPut=async()=>{
         await axios.put(urlput+postInsertado.id, postInsertado)
         .then(response=>{
-          var dataNueva=data;
+            console.log(response);
+          var dataNueva=data.data;
           dataNueva.map(post=>{
             if(postInsertado.id===post.id){
               post.title=postInsertado.title;
@@ -159,9 +160,10 @@ const Posts = (authorized) =>{
 
     return(
     <div className='posts'>
-        <div className='nav_posts'>
-            <Button style={{color: "rgba(255,255,255)"}} className="log_outB"onClick={logoutUser}>Log out</Button>
-        </div>
+    <div className='buttons_posts'>
+      <Button style={{color: "rgba(255,255,255)"}} onClick={()=>openCloseModalInsert()}>Nuevo Post</Button>
+      <Button style={{color: "rgba(255,255,255)"}} className="log_outB"onClick={logoutUser}>Log out</Button>
+    </div>
       <Grid container className='posts_grid'>
           {data.data?.map(post=>(
           <Grid item key={post.id}>{/*KeyContent*/}
@@ -183,7 +185,6 @@ const Posts = (authorized) =>{
           ))}
       </Grid>
       
-      <Button style={{color: "rgba(0,0,0)"}} onClick={()=>openCloseModalInsert()}>Nuevo Post</Button>
 
       <Modal open = {modalInsert}
       onClose = {openCloseModalInsert}>
@@ -200,7 +201,7 @@ const Posts = (authorized) =>{
           {ModalBodyDelete}
       </Modal>
       
-    </div>
+     </div>
     
     );
 }
