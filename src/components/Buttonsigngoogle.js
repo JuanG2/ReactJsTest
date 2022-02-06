@@ -1,10 +1,10 @@
 import './Buttonsign.css'
-import {authentication} from '../firebase-config';
+import {auth} from '../firebase-config';
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 const signInWhitGoogle = () =>{
     const provider = new GoogleAuthProvider();
-    signInWithPopup(authentication, provider)
+    signInWithPopup(auth, provider)
     .then((re) =>{
         console.log(re);
     })

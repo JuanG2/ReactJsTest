@@ -1,0 +1,30 @@
+.form {
+    width: 100%;
+  }
+  
+  .form > h2 {
+    text-align: center;
+  }
+  
+  .form > form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  
+  .form > form > p {
+    cursor: pointer;
+  }
+
+  .button_log {
+    background-color: rgb(75, 4, 189);
+    border: none;
+    color: white;
+    padding: 12px;
+    margin: 12px 0;
+    box-shadow: 0 1px 6px #ccc;
+    width: 100%;
+    border-radius: 6px;
+    font-size: 18px;
+  }

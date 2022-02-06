@@ -1,15 +1,20 @@
-import logo from './logo.svg';
 import './App.css';
 import Buttonsigngoogle from './components/Buttonsigngoogle';
-import Login from './Pages/Login';
+import Posts from './Pages/Posts';
+import { useUserContext } from "./context/userContext";
+import Auth from "./components/auth";
+
 
 function App() {
+  const { user, loading, error } = useUserContext();
+
   return (
     <div className="App">
-      <Login></Login>
-      <Buttonsigngoogle text={"SignIn"}></Buttonsigngoogle>
+      {error && <p className="error">{error}</p>}
+      {loading ? <h2>Loading...</h2> : <> {user ? <Posts /> : <Auth />} </>}
     </div>
-  );
+    );
+ 
 }
 
 export default App;
